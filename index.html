@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="tippy.js/animations/scale-extreme.css">
+        <style>
+            body {
+                font-family: 'Rubik', sans-serif;
+            }
+            .radio-label {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                margin: 10px;
+                padding: 10px 30px;
+                cursor: pointer;
+                border-radius: 50px;
+                transition: .3s;
+            }
+            .radio-input {
+                cursor: pointer;
+                left: 0;
+                top: 0;
+                width: 20px;
+                height: 20px;
+                border-radius: 0px;
+            }
+            .radio-text {
+                color: #efefef;
+                font-size: 30px;
+                margin: 10px 3px;
+            }
+            .radio-label:hover,
+            .radio-label:focus-within {
+                background: #3a356b;
+        }
+        </style>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <title>Question 1</title>
+    </head>
+    <body style="
+    background-color: #060a1a;
+    ">
+        <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        ">
+            <h1 style="
+            color: #efefef;
+            font-size: 50px;
+            ">
+                Zoom to see the Plots Clearly
+            </h1>
+            <div style="
+            display: flex;
+            flex-direction: row;
+            ">
+                <label class="radio-label">
+                    <input type="radio" id="2011" class="radio-input" name="radio" checked>
+                    <div class="radio-text">2011</div>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" id="2012" class="radio-input" name="radio">
+                    <div class="radio-text">2012</div>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" id="2013" class="radio-input" name="radio">
+                    <div class="radio-text">2013</div>
+                </label>
+            </div>
+
+            <div style="
+            display: flex;
+            ">
+                <svg id="plot1" width="1100" height="750"></svg>
+                <svg id="plot2" width="1100" height="900"></svg>
+            </div>
+        </div>
+    
+        <!-- Production -->
+        <script src="https://unpkg.com/@popperjs/core@2"></script>
+        <script src="https://unpkg.com/tippy.js@6"></script>
+        <script>
+            window.onload = function() {
+                document.body.style.zoom = "60%";
+            }
+
+            let rawData = [];
+            let Names = [];
+            let X2011 = [];
+            let X2012 = [];
+            let X2013 = [];
+            
+            d3.csv("https://raw.githubusercontent.com/Pyrole-2002/D3_Lab2/main/yearwise.csv").then(function(data) {
+                data.forEach(function(d) {
+                    Names.push(d.Name);
+                    X2011.push(d.X2011);
+                    X2012.push(d.X2012);
+                    X2013.push(d.X2013);
+                });
+                rawData = data;
+
+                xScale1 = d3.scaleBand()
+                    .domain(Names)
+                    .range([0, width])
+                    .padding(0.3);
+                yScale1 = d3.scaleLinear()
+                    .domain([yMax1, 0])
+                    .range([0, height]);
+
+                var xAxis1 = d3.axisBottom(xScale1)
+                    .tickFormat(function(d) {
+                        return d;
+                    });
+                var yAxis = d3.axisLeft(yScale1)
+                    .tickFormat(function (d) {
+                        return d;
+                    });
+
+                xScale2 = d3.scaleLinear()
+                    .domain([0, xMax2])
+                    .range([0, width]);
+                yScale2 = d3.scaleLinear()
+                    .domain([yMax2, 0])
+                    .range([0, height]);
+                
+                var xAxis2 = d3.axisBottom(xScale2)
+                    .tickFormat(function (d) {
+                        return d;
+                    });
+
+                var yAxis2 = d3.axisLeft(yScale2)
+                    .tickFormat(function (d) {
+                        return d;
+                    });
+
+                group1.append("g")
+                    .attr("transform", "translate(" + 0 + ", " + height + ")")
+                    .call(xAxis1)
+                    .selectAll("line,path")
+                    .style("stroke", "#efefef")
+                    .style("stroke-width", "2px");
+                
+                group1.append("g")
+                    .attr("transform", "translate(" + 0 + ", " + 0 + ")")
+                    .call(yAxis)
+                    .selectAll("line,path")
+                    .style("stroke", "#efefef")
+                    .style("stroke-width", "2px")
+                    
+                group1.selectAll("text")
+                    .style("font-family", "Rubik")
+                    .style("fill", "#efefef")
+                    .style("font-size", "18px");
+
+                group1.append("text")
+                    .attr("id", "yAxisLabel")
+                    .attr("transform", "rotate(-90)")
+                    .style("font-size", "25px")
+                    .attr("y", 40 - (margin / 2))
+                    .attr("x", -40 - (height / 2))
+                    .style("font-family", "Rubik")
+                    .style("fill", "#efefef")
+                    .text("VALUE");
+                
+                group1.append("text")
+                    .attr("id", "xAxisLabel")
+                    .attr("y", height + 70)
+                    .attr("x", width / 2 - 30)
+                    .style("font-size", "25px")
+                    .style("font-family", "Rubik")
+                    .style("fill", "#efefef")
+                    .text("Name");
+                
+                group2.append("g")
+                    .attr("transform", "translate(" + 0 + ", " + height + ")")
+                    .call(xAxis2)
+                    .selectAll("line,path")
+                    .style("stroke", "#efefef")
+                    .style("stroke-width", "2px");
+
+                group2.append("g")
+                    .attr("transform", "translate(" + 0 + ", " + 0 + ")")
+                    .call(yAxis2)
+                    .selectAll("line,path")
+                    .style("stroke", "#efefef")
+                    .style("stroke-width", "2px")
+
+                group2.selectAll("text")
+                    .style("font-family", "Rubik")
+                    .style("fill", "#efefef")
+                    .style("font-size", "18px");
+
+                group2.append("text")
+                    .attr("id", "yAxisLabel")
+                    .attr("transform", "rotate(-90)")
+                    .style("font-size", "25px")
+                    .attr("y", 40 - (margin / 2))
+                    .attr("x", -40 - (height / 2))
+                    .style("font-family", "Rubik")
+                    .style("fill", "#efefef")
+                    .text("Y Axis");
+
+                group2.append("text")
+                    .attr("id", "xAxisLabel")
+                    .attr("y", height + 70)
+                    .attr("x", (width / 2) - 30)
+                    .style("font-size", "25px")
+                    .style("font-family", "Rubik")
+                    .style("fill", "#efefef")
+                    .text("X Axis");
+
+                updatePlot1(X2011);
+                updatePlot2(2011, X2011);
+            });
+                
+            var canvas1 = d3.select("#plot1");
+            var canvas2 = d3.select("#plot2");
+
+            var margin = 200;
+            var width = canvas1.attr("width") - margin;
+            var height = canvas1.attr("height") - margin;
+            
+            var yMax1 = 100;
+            var xScale1;
+            var yScale1;
+
+            var xMax2 = 100;
+            var yMax2 = 100;
+            var xScale2;
+            var yScale2;
+
+            var group1 = canvas1.append("g")
+                .attr("transform", "translate(" + (margin / 2) + "," + (margin / 2) + ")");
+            var group2 = canvas2.append("g")
+                .attr("transform", "translate(" + (margin / 2) + "," + (margin / 2) + ")");
+                
+            function updatePlot1(data) {
+                var bars = group1.selectAll("rect")
+                    .data(data);
+                
+                bars.enter()
+                    .append("rect")
+                    .merge(bars)
+                    .attr("id", function(d, i) {
+                        return "bar" + i;
+                    })
+                    .attr("x", function(d, i) {
+                        return xScale1(Names[i]);
+                    })
+                    .attr("height", 0)
+                    .attr("y", height)
+                    .attr("width", xScale1.bandwidth())
+                    .each(function (d, i) {
+                        tippy(this, {
+                            content: Names[i] + ": " + d,
+                            placement: "top",
+                        });
+                    })
+                    .transition()
+                    .duration(300)
+                    .attr("y", function(d) {
+                        return yScale1(d);
+                    })
+                    .attr("height", function(d) {
+                        return height - yScale1(d);
+                    })
+                    .style("fill", "#ff4f6c")
+                    .style("opacity", "0.3")
+                
+                group1.selectAll("rect")
+                    .on("mouseover", function(event, d) {
+                        let i = d3.select(this).attr("id").slice(3);
+
+                        d3.select(this)
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#ff006a")
+                            .style("opacity", "1");
+                        group2.selectAll("circle")
+                            .filter(function(d, j) {
+                                return j == i;
+                            })
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#0033ff")
+                            .style("opacity", "1");
+                    })
+                    .on("mouseout", function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#ff4f6c")
+                            .style("opacity", "0.3");
+                        group2.selectAll("circle")
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#6190ff")
+                            .style("opacity", "0.3");
+                    })
+            }
+            function updatePlot2(year, xArray) {
+                var circles = group2.selectAll("circle")
+                    .data(xArray);
+
+                circles.enter()
+                    .append("circle")
+                    .merge(circles)
+                    .attr("id", function (d, i) {
+                        return "circle" + i;
+                    })
+                    .attr("cx", function (d, i) {
+                        return xScale2(rawData[i]["X" + year]);
+                    })
+                    .attr("cy", function (d, i) {
+                        return yScale2(rawData[i]["Y" + year]);
+                    })
+                    .attr("r", 0)
+                    .each(function (d, i) {
+                        tippy(this, {
+                            content: Names[i] + " " + "(" + rawData[i]["X" + year] + ", " + rawData[i]["Y" + year] + ")" + ", " + "R" + ": " + rawData[i]["R" + year],
+                        });
+                    })
+                    .transition()
+                    .duration(300)
+                    .attr("r", function (d, i) {
+                        return 4 * rawData[i]["R" + year];
+                    })
+                    .style("fill", "#6190ff")
+                    .style("opacity", "0.3");
+
+                group2.selectAll("circle")
+                    .on("mouseover", function (event, d) {
+                        let i = d3.select(this).attr("id").slice(6);
+                        let xHover = width - (margin / 2);
+                        let yHover = 0;
+                        d3.select(this)
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#0033ff")
+                            .style("opacity", "1");
+                        group1.selectAll("rect")
+                            .filter(function (d, j) {
+                                return j == i;
+                            })
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#ff006a")
+                            .style("opacity", "1");
+                    })
+                    .on("mouseout", function (event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#6190ff")
+                            .style("opacity", "0.3")
+                        group1.selectAll("rect")
+                            .transition()
+                            .duration(250)
+                            .style("fill", "#ff4f6c")
+                            .style("opacity", "0.3");
+                    });
+            }
+
+
+            
+            document.getElementById("2011")
+                .addEventListener("click", function() {
+                    updatePlot1(X2011);
+                    updatePlot2(2011, X2011);
+                });
+            document.getElementById("2012")
+                .addEventListener("click", function() {
+                    updatePlot1(X2012);
+                    updatePlot2(2012, X2012);
+                });
+            document.getElementById("2013")
+                .addEventListener("click", function() {
+                    updatePlot1(X2013);
+                    updatePlot2(2013, X2013);
+                });
+        </script>
+    </body>
+</html>
